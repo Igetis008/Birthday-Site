@@ -1,0 +1,1517 @@
+/* ==========================================================================
+   ROMANTIC & CELEBRATORY BIRTHDAY COUNTDOWN SITE - DESIGN SYSTEM & STYLES
+   Theme: Books & Poetry, Wanderlust, Warm Sunset/Dusty Rose, Glowing Lights
+   ========================================================================== */
+
+/* --- Custom Variables & Tokens --- */
+:root {
+    /* Color Palette */
+    --color-bg-cream: #FCF8F2;
+    /* Warm parchment page */
+    --color-bg-paper: #FAF0E6;
+    /* Slightly deeper paper texture */
+    --color-sunset-gold: #E5A93B;
+    /* Bright sunset gold */
+    --color-gold-glow: rgba(229, 169, 59, 0.45);
+    --color-dusty-rose: #C57E88;
+    /* Whimsical dusty rose */
+    --color-rose-light: #F2D2D6;
+    /* Soft warm pink */
+    --color-rose-dark: #A3505D;
+    /* Deep rose/burgundy */
+    --color-text-charcoal: #2C2523;
+    /* Warm charcoal (avoid harsh pure black) */
+    --color-text-muted: #6E615E;
+    /* Soft warm gray for captions/subtitles */
+    --color-glass-bg: rgba(253, 248, 242, 0.65);
+    --color-glass-border: rgba(255, 255, 255, 0.7);
+
+    /* Fonts */
+    --font-script: 'Dancing Script', cursive;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, sans-serif;
+
+    /* Transitions & Shadows */
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --transition-quick: all 0.2s ease;
+    --shadow-soft: 0 10px 30px rgba(197, 126, 136, 0.12);
+    --shadow-medium: 0 15px 40px rgba(44, 37, 35, 0.08);
+    --shadow-glow: 0 0 25px var(--color-gold-glow);
+}
+
+/* --- Core Reset & Document Setup --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: var(--color-text-charcoal);
+    background: radial-gradient(circle at 50% 10%, #FEF8F3 0%, #FADCD5 60%, #E8B4B8 100%);
+    /* dvh accounts for mobile browser toolbars so the page truly fills the visible screen;
+       min-height 100vh is the fallback for browsers that don't support dvh yet */
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Make sure media never forces horizontal scroll on any screen size */
+img,
+svg,
+canvas,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Firefly Background Canvas --- */
+#firefly-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- Typography & Global Utilities --- */
+.text-center {
+    text-align: center;
+}
+
+.serif-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-text-muted);
+}
+
+.script-title {
+    font-family: var(--font-script);
+    font-weight: 700;
+    color: var(--color-rose-dark);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Buttons styling */
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: var(--font-sans);
+}
+
+/* --- Music Attribution Tag (required for the CC BY licensed track) --- */
+.music-credit-tag {
+    position: fixed;
+    left: 12px;
+    bottom: 10px;
+    z-index: 90;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 4px 10px;
+    border-radius: 20px;
+    opacity: 0.75;
+    pointer-events: auto;
+    max-width: calc(100vw - 24px);
+}
+
+.music-credit-tag a {
+    color: var(--color-rose-dark);
+}
+
+/* --- Floating Audio Player --- */
+.audio-control-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.audio-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+    color: var(--color-text-charcoal);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.audio-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(197, 126, 136, 0.2);
+    border-color: var(--color-dusty-rose);
+}
+
+.music-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-dusty-rose);
+}
+
+.icon-playing {
+    animation: rotateMusic 4s linear infinite;
+}
+
+.audio-btn.muted .music-icon {
+    animation: none;
+    color: var(--color-text-muted);
+}
+
+/* --- Main Layout Wrapper --- */
+.main-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(30px, 8vw, 60px) clamp(12px, 4vw, 20px) clamp(30px, 5vw, 50px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* The locked/unlocked states below both stay in the DOM at once so they can
+       cross-fade smoothly. The inactive one is absolutely positioned and would
+       otherwise still add its full (often much taller) height to the page's
+       scrollable area even while invisible. Clipping it here stops that phantom
+       whitespace without affecting the fade/slide transition itself. */
+    overflow: hidden;
+}
+
+/* --- Transition states --- */
+.state-container {
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.8s;
+}
+
+.state-container.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    position: relative;
+    visibility: visible;
+}
+
+/* --- STATE 1: LOCKED COUNTDOWN SCREEN --- */
+
+/* Centerpiece Glowing Book */
+.centerpiece-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 180px;
+    margin-bottom: 25px;
+    margin-top: 20px;
+}
+
+.glowing-orb {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-sunset-gold) 0%, rgba(229, 169, 59, 0) 70%);
+    opacity: 0.6;
+    filter: blur(15px);
+    animation: orbPulse 4s ease-in-out infinite alternate;
+}
+
+.book-illustration {
+    color: var(--color-rose-dark);
+    filter: drop-shadow(0 0 12px var(--color-rose-light));
+    animation: bookFloat 6s ease-in-out infinite;
+}
+
+.svg-book {
+    width: 120px;
+    height: 120px;
+}
+
+/* Teaser Header */
+.teaser-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.teaser-header .subtitle {
+    font-size: 1.15rem;
+    margin-bottom: 40px;
+    letter-spacing: 0.5px;
+}
+
+/* Countdown Card (Passport/Stamped Paper design) */
+.countdown-card-wrapper {
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto 30px;
+    position: relative;
+    padding: 10px;
+}
+
+.countdown-card {
+    background: #FFF7ED;
+    /* Brighter paper cream */
+    background-image: radial-gradient(var(--color-rose-light) 0.5px, transparent 0.5px), radial-gradient(var(--color-rose-light) 0.5px, #FFF7ED 0.5px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    border: 3px double rgba(224, 142, 150, 0.75);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: var(--shadow-medium), inset 0 0 40px rgba(224, 142, 150, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Old postmark stamp overlay */
+.postmark-stamp {
+    position: absolute;
+    top: 12px;
+    right: 17px;
+    width: 80px;
+    height: 80px;
+    color: rgba(162, 79, 87, 0.45);
+    transform: rotate(12deg);
+    pointer-events: none;
+}
+
+.svg-postmark {
+    width: 100%;
+    height: 100%;
+}
+
+.countdown-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.time-num {
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-rose-dark);
+    line-height: 1;
+    text-shadow: 1px 1px 0px #fff;
+}
+
+.time-divider {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--color-dusty-rose);
+    margin-bottom: 20px;
+    animation: dividerBlink 1s infinite alternate;
+}
+
+.time-label {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-text-muted);
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+/* While You Wait Hub */
+.waiting-room-hub {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.divider-line {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(163, 80, 93, 0) 0%, var(--color-dusty-rose) 50%, rgba(163, 80, 93, 0) 100%);
+    flex: 1;
+}
+
+.divider-icon {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-rose-dark);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 30px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(8px);
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-rose-light);
+    color: var(--color-rose-dark);
+}
+
+.tab-btn.active {
+    background: var(--color-rose-dark);
+    color: #fff;
+    border-color: var(--color-rose-dark);
+    box-shadow: 0 8px 20px rgba(163, 80, 93, 0.3);
+}
+
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.6s ease;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.tab-intro {
+    font-size: 1.05rem;
+    margin-bottom: 30px;
+}
+
+/* Mini Games Grid */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+}
+
+.game-card {
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 18px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(10px);
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(197, 126, 136, 0.2);
+    border-color: var(--color-dusty-rose);
+}
+
+.game-card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    display: inline-block;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+    animation: floatIcon 4s ease-in-out infinite alternate;
+}
+
+#card-fillblank .game-card-icon {
+    animation-delay: 0.5s;
+}
+
+#card-reorder .game-card-icon {
+    animation-delay: 1s;
+}
+
+.game-card h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    color: var(--color-rose-dark);
+    margin-bottom: 10px;
+}
+
+.game-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin-bottom: 25px;
+    min-height: 72px;
+}
+
+.play-btn {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px 20px;
+    background: var(--color-sunset-gold);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    box-shadow: 0 4px 10px rgba(229, 169, 59, 0.25);
+    transition: var(--transition-quick);
+    margin-top: auto;
+    align-self: center;
+}
+
+.play-btn:hover {
+    background: #d4982c;
+    transform: scale(1.04);
+    box-shadow: 0 6px 15px rgba(229, 169, 59, 0.4);
+}
+
+/* "Her Own Words" Quiz Section */
+.quiz-container {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.quiz-question {
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-soft);
+    padding: 18px 22px 20px;
+    backdrop-filter: blur(8px);
+    transition: var(--transition-smooth);
+}
+
+.quiz-question:hover {
+    border-color: var(--color-rose-light);
+}
+
+.quiz-label {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-rose-dark);
+    margin-bottom: 10px;
+}
+
+.quiz-textarea {
+    width: 100%;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.98rem;
+    color: var(--color-text-charcoal);
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(163, 80, 93, 0.18);
+    border-radius: 10px;
+    padding: 12px 14px;
+    resize: vertical;
+    line-height: 1.6;
+    transition: var(--transition-quick);
+}
+
+.quiz-textarea:focus {
+    outline: none;
+    border-color: var(--color-dusty-rose);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 3px rgba(197, 126, 136, 0.12);
+}
+
+.quiz-textarea::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+}
+
+.quiz-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.quiz-save-status {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--color-rose-dark);
+    min-height: 1.2em;
+}
+
+.delete-btn{
+    display:inline-block;
+    vertical-align:middle;
+    padding:10px 20px;
+
+    background:#b96a76;
+    color:#fff;
+
+    border:none;
+    border-radius:20px;
+
+    font-size:0.88rem;
+    font-weight:600;
+    letter-spacing:.4px;
+
+    cursor:pointer;
+
+    box-shadow:0 4px 10px rgba(185,106,118,.25);
+
+    transition:.25s ease;
+}
+
+.delete-btn:hover{
+    background:#a95b67;
+    transform:translateY(-2px);
+}
+
+.delete-btn:active{
+    transform:translateY(0);
+}
+/* --- STATE 2: UNLOCKED BIRTHDAY REVEAL SCREEN --- */
+
+.reveal-header {
+    margin-bottom: 35px;
+    margin-top: 10px;
+}
+
+.compass-flourish {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 20px;
+    color: var(--color-rose-dark);
+    filter: drop-shadow(0 4px 8px var(--color-rose-light));
+    animation: rotateCompass 30s linear infinite;
+}
+
+.svg-compass {
+    width: 100%;
+    height: 100%;
+}
+
+.birthday-title {
+    font-size: 4.5rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.animate-glow {
+    animation: textGlow 2.5s ease-in-out infinite alternate;
+}
+
+.birthday-tagline {
+    font-size: 1.3rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Poetry Book Card */
+.poetry-book-card {
+    background: #FAF6EE;
+    border-left: 8px solid var(--color-rose-dark);
+    border-radius: 8px 24px 24px 8px;
+    padding: 50px 40px;
+    box-shadow: var(--shadow-medium), 0 20px 50px rgba(0, 0, 0, 0.06);
+    position: relative;
+    max-width: 680px;
+    margin: 0 auto 40px;
+    background-image: linear-gradient(rgba(163, 80, 93, 0.05) 1px, transparent 1px);
+    background-size: 100% 2em;
+    /* Lines representing paper */
+    line-height: 2em;
+}
+
+.poetry-book-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 1px;
+    height: 100%;
+    background: rgba(163, 80, 93, 0.1);
+}
+
+.pressed-flower-decoration {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.8rem;
+    filter: grayscale(10%) opacity(0.85) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.1));
+}
+
+.poetry-content {
+    font-family: var(--font-serif);
+    font-size: 1.18rem;
+    color: var(--color-text-charcoal);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.poem-stanza {
+    margin-bottom: 1.8rem;
+    font-style: italic;
+}
+
+.poem-stanza:last-child {
+    margin-bottom: 0;
+}
+
+/* Polaroid Gallery */
+.gallery-section {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.gallery-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+.polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 35px 25px;
+    padding: 10px;
+}
+
+.polaroid-card {
+    background: #fff;
+    padding: 15px 15px 25px 15px;
+    box-shadow: 0 8px 24px rgba(44, 37, 35, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+    position: relative;
+}
+
+.polaroid-card::after {
+    /* Tape effect at the top */
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 80px;
+    height: 25px;
+    background: rgba(254, 240, 224, 0.6);
+    backdrop-filter: blur(1px);
+    transform: translateX(-50%) rotate(-3deg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.polaroid-img-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #eee;
+}
+
+.polaroid-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(10%) contrast(95%);
+    transition: var(--transition-smooth);
+}
+
+.polaroid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.15) 100%);
+    pointer-events: none;
+}
+
+.polaroid-caption {
+    font-family: var(--font-script);
+    font-size: 1.35rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-text-charcoal);
+    margin-top: 15px;
+    min-height: 28px;
+}
+
+/* Rotations for polaroids to give a messy notebook vibe */
+.rotation-left {
+    transform: rotate(-3deg);
+}
+
+.rotation-right {
+    transform: rotate(3deg);
+}
+
+.rotation-slight {
+    transform: rotate(1deg);
+}
+
+.polaroid-card:hover {
+    transform: rotate(0deg) scale(1.05) translateY(-8px);
+    box-shadow: 0 20px 40px rgba(44, 37, 35, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.polaroid-card:hover img {
+    filter: sepia(0%) contrast(100%);
+}
+
+/* Signature */
+.signature-container {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.paper-airplane-trail {
+    font-size: 1.5rem;
+    display: inline-block;
+    animation: floatPlane 6s linear infinite;
+    position: relative;
+}
+
+.signature-text {
+    font-size: 2.2rem;
+    line-height: 1.2;
+}
+
+.signature-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Revisit Hub Accordion in Unlocked Mode */
+.revisit-hub-container {
+    width: 100%;
+    max-width: 750px;
+    margin: 10px auto 0;
+    border-top: 1px dashed rgba(163, 80, 93, 0.2);
+    padding-top: 25px;
+}
+
+.secondary-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 30px;
+    color: var(--color-rose-dark);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+}
+
+.secondary-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(242, 210, 214, 0.3);
+    border-color: var(--color-dusty-rose);
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+}
+
+.secondary-btn.active .btn-arrow {
+    transform: rotate(180deg);
+}
+
+.collapsible-hub {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+    width: 100%;
+}
+
+.collapsible-hub.active {
+    max-height: 2000px;
+    /* Large value to accommodate contents */
+    margin-top: 40px;
+}
+
+
+/* ========================================== */
+/* GAME SCREEN OVERLAYS (MODALS)              */
+/* ========================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 37, 35, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    background: var(--color-bg-cream);
+    border: 1px solid var(--color-rose-light);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow-y: auto;
+    padding: 40px 30px;
+    transform: scale(0.9);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .modal-card {
+    transform: scale(1);
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2.2rem;
+    color: var(--color-text-muted);
+    line-height: 1;
+    transition: var(--transition-quick);
+}
+
+.close-modal-btn:hover {
+    color: var(--color-rose-dark);
+    transform: rotate(90deg);
+}
+
+.modal-game-title {
+    font-size: 2.3rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.game-instruction {
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--color-text-muted);
+}
+
+.game-container-inner {
+    display: none;
+}
+
+.game-container-inner.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+/* Shared stats bar for the new mini games */
+.scramble-stats-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(229, 169, 59, 0.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.scramble-stats-bar strong {
+    color: var(--color-rose-dark);
+    font-size: 1.15rem;
+}
+
+.reset-game-btn {
+    padding: 5px 12px;
+    background: #fff;
+    border: 1px solid var(--color-rose-light);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-rose-dark);
+    transition: var(--transition-quick);
+}
+
+.reset-game-btn:hover {
+    background: var(--color-rose-light);
+}
+
+.victory-message {
+    text-align: center;
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(229, 169, 59, 0.1);
+    border: 1px dashed var(--color-sunset-gold);
+    border-radius: 12px;
+    animation: scaleUp 0.5s ease;
+}
+
+.victory-text {
+    font-size: 1.1rem;
+    color: var(--color-rose-dark);
+}
+
+/* GAME 1: WORD BLOOM (SCRAMBLE) SPECIFICS */
+.scramble-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+
+.scramble-answer-slot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    min-height: 54px;
+    transition: transform 0.15s ease;
+}
+
+.scramble-slot {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 2px dashed rgba(163, 80, 93, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--color-rose-dark);
+}
+
+.scramble-slot.filled {
+    border-style: solid;
+    background: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+}
+
+.scramble-answer-slot.scramble-success .scramble-slot {
+    border-color: var(--color-sunset-gold);
+    background: rgba(229, 169, 59, 0.18);
+}
+
+.scramble-answer-slot.scramble-shake {
+    animation: gentleShake 0.45s ease;
+}
+
+.scramble-letters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.scramble-tile {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-rose-light) 0%, var(--color-dusty-rose) 100%);
+    color: #fff;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: var(--transition-quick);
+}
+
+.scramble-tile:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.scramble-tile.used {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scramble-hint-btn {
+    margin-top: 4px;
+}
+
+/* GAME 2: FILL THE VERSE SPECIFICS */
+.fillblank-verse-text {
+    font-size: 1.25rem;
+    text-align: center;
+    line-height: 1.9;
+    margin-bottom: 26px;
+    color: var(--color-text-charcoal);
+}
+
+.fillblank-target {
+    display: inline-block;
+    min-width: 70px;
+    padding: 2px 8px;
+    border-bottom: 2px solid var(--color-dusty-rose);
+    color: var(--color-rose-dark);
+    font-weight: 700;
+    font-style: normal;
+}
+
+.fillblank-target.fillblank-filled {
+    border-bottom-color: var(--color-sunset-gold);
+    background: rgba(229, 169, 59, 0.12);
+    border-radius: 6px;
+}
+
+.fillblank-options {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fillblank-option-btn {
+    padding: 10px 18px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 20px;
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    color: var(--color-rose-dark);
+    transition: var(--transition-quick);
+}
+
+.fillblank-option-btn:hover:not(:disabled) {
+    background: var(--color-rose-light);
+    transform: translateY(-2px);
+}
+
+.fillblank-option-btn:disabled {
+    opacity: 0.55;
+}
+
+.fillblank-shake {
+    animation: gentleShake 0.45s ease;
+}
+
+/* GAME 3: VERSE WEAVER (LINE REORDER) SPECIFICS */
+.reorder-sequence {
+    min-height: 20px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reorder-sequence-line {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.02rem;
+    color: var(--color-text-charcoal);
+    background: rgba(229, 169, 59, 0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.reorder-line-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-sunset-gold);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+.reorder-pool {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reorder-pool-line {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 12px;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--color-text-charcoal);
+    transition: var(--transition-quick);
+}
+
+.reorder-pool-line:hover {
+    border-color: var(--color-dusty-rose);
+    transform: translateX(4px);
+}
+
+.reorder-shake {
+    animation: gentleShake 0.45s ease;
+}
+
+
+/* ========================================== */
+/* KEYFRAMES & ANIMATIONS                     */
+/* ========================================== */
+
+@keyframes rotateMusic {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bookFloat {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(1deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+}
+
+@keyframes orbPulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+}
+
+@keyframes dividerBlink {
+    0% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes textGlow {
+    from {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px var(--color-gold-glow);
+    }
+
+    to {
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px var(--color-gold-glow), 0 0 40px rgba(229, 169, 59, 0.6);
+    }
+}
+
+@keyframes rotateCompass {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes floatIcon {
+    0% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes gentleShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(6px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+@keyframes floatPlane {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(5px, -3px) rotate(5deg);
+    }
+
+    50% {
+        transform: translate(0, -6px) rotate(0deg);
+    }
+
+    75% {
+        transform: translate(-5px, -3px) rotate(-5deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
+
+/* ========================================== */
+/* RESPONSIVENESS                             */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .teaser-header h1 {
+        font-size: 2.2rem;
+    }
+
+    .countdown-card {
+        padding: 30px 15px;
+    }
+
+    .time-num {
+        font-size: 2.5rem;
+    }
+
+    .time-divider {
+        font-size: 1.8rem;
+    }
+
+    .birthday-title {
+        font-size: 3rem;
+    }
+
+    .poetry-book-card {
+        padding: 35px 25px;
+        line-height: 1.8em;
+        font-size: 1.05rem;
+    }
+
+    .polaroid-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px 20px;
+    }
+
+    .modal-card {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .teaser-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .time-num {
+        font-size: 1.8rem;
+    }
+
+    .time-divider {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+
+    .time-label {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    .tab-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quiz-label {
+        font-size: 0.98rem;
+    }
+
+    .quiz-question {
+        padding: 14px 16px 16px;
+    }
+
+    .birthday-title {
+        font-size: 2.5rem;
+    }
+
+    .scramble-slot {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+
+    .scramble-tile {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .fillblank-verse-text {
+        font-size: 1.08rem;
+    }
+
+    .reorder-pool-line {
+        font-size: 0.92rem;
+        padding: 10px 12px;
+    }
+
+    .music-credit-tag {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+}
+
+/* Very small phones (older/smaller devices) */
+@media (max-width: 360px) {
+    .countdown-grid {
+        gap: 6px;
+    }
+
+    .time-num {
+        font-size: 1.5rem;
+    }
+
+    .postmark-stamp {
+        width: 70px;
+        height: 70px;
+    }
+
+    .scramble-slot {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .scramble-tile {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+}
+
+/* Larger laptop/desktop screens: give the layout a touch more breathing room */
+@media (min-width: 1200px) {
+    .main-wrapper {
+        max-width: 960px;
+    }
+
+    .poetry-book-card {
+        padding: 60px 70px;
+    }
+}

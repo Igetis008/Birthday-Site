@@ -31,6 +31,26 @@ const pulsingBook = document.getElementById("pulsing-book");
 let isUnlocked = false;
 let countdownInterval;
 let floatingPagesInterval = null;
+let userInteracted = false;
+let pendingRevealAudio = false;
+
+function tryPlayRevealAudio() {
+    if (userInteracted) {
+        playBirthdayVoiceThenMusic();
+    } else {
+        pendingRevealAudio = true;
+    }
+}
+
+["click", "touchstart", "keydown"].forEach(evt => {
+    document.addEventListener(evt, function unlockAudioOnce() {
+        userInteracted = true;
+        if (pendingRevealAudio) {
+            pendingRevealAudio = false;
+            playBirthdayVoiceThenMusic();
+        }
+    }, { once: true });
+});
 
 // ==========================================
 // 2. AMBIENT BACKGROUND FIREFLY CANVAS
@@ -435,7 +455,6 @@ function triggerReveal(isRealTime = false) {
     if (!floatingPagesInterval) {
         floatingPagesInterval = setInterval(spawnPage, 1500);
     }
-
     // Move the Games hub into the unlocked page's collapsible wrapper (games only —
     // the quiz now lives permanently on the unlocked page, it's never moved)
     const hubNode = document.querySelector(".waiting-room-hub");
@@ -448,7 +467,6 @@ function triggerReveal(isRealTime = false) {
             dividerLabel.textContent = "✨ A Little More Magic ✨";
         }
     }
-
     if (isRealTime) {
         // Magical real-time unlock transition
         pulsingBook.style.animation = "none";
@@ -456,16 +474,14 @@ function triggerReveal(isRealTime = false) {
         pulsingBook.style.filter = "drop-shadow(0 0 40px rgba(229,169,59,1))";
         pulsingBook.style.opacity = "0";
         pulsingBook.style.transition = "transform 1.8s ease, filter 1.8s ease, opacity 1.8s ease";
-
         // Confetti burst helper
         setTimeout(() => {
             // Screen fades out, swap elements, fade back in
             lockedStateEl.classList.remove("active");
-
             setTimeout(() => {
                 unlockedStateEl.classList.add("active");
                 fireworkConfetti();
-                playBirthdayVoiceThenMusic();
+                tryPlayRevealAudio();
             }, 800);
         }, 1500);
     } else {
@@ -475,11 +491,10 @@ function triggerReveal(isRealTime = false) {
         // Trigger small welcoming confetti burst
         setTimeout(() => {
             fireworkConfetti();
-            playBirthdayVoiceThenMusic();
+            tryPlayRevealAudio();
         }, 1000);
     }
 }
-
 // ==========================================
 // BIRTHDAY VOICE GREETING + FOLLOW-UP MUSIC
 // ==========================================

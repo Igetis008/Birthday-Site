@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ROMANTIC & CELEBRATORY BIRTHDAY COUNTDOWN SITE - LOGIC & INTERACTION
+   FRIENDSHIP & CELEBRATORY BIRTHDAY COUNTDOWN SITE - LOGIC & INTERACTION
    Includes: Particle systems, Countdown checks, Audio control, and 3 games
    ========================================================================== */
 
@@ -10,7 +10,7 @@
 // CUSTOMIZATION POINT: Change your target birthday date/time here.
 // Format: ISO 8601 string. The "+05:30" denotes the timezone offset (e.g. IST).
 // If you want it for UTC, use "2026-07-15T00:00:00Z".
-const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
+const TARGET_DATE_STRING = "2020-07-29T00:00:00+05:30";
 
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";
@@ -24,7 +24,6 @@ const minutesEl = document.getElementById("minutes");
 const secondsEl = document.getElementById("seconds");
 const lockedStateEl = document.getElementById("locked-state");
 const unlockedStateEl = document.getElementById("unlocked-state");
-const bgMusic = document.getElementById("bg-music");
 const musicToggleBtn = document.getElementById("music-toggle-btn");
 const pulsingBook = document.getElementById("pulsing-book");
 
@@ -126,6 +125,9 @@ const fireflyBg = new AmbientFireflies("firefly-canvas");
 let isAudioPlaying = false;
 let player;
 let isPlayerReady = false;
+let pendingAutoPlay = false; // set true if we tried to auto-start music before the player was ready
+const LOCKED_MUSIC = "DDbJ8yEwUiA";
+const BIRTHDAY_MUSIC = "vhVBWw6rId0";
 
 // Dynamically load the YouTube IFrame API script
 const tag = document.createElement("script");
@@ -138,13 +140,13 @@ window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('youtube-player', {
         height: '1',
         width: '1',
-        videoId: 'DDbJ8yEwUiA',
+        videoId: LOCKED_MUSIC, // Live stream source: https://www.youtube.com/live/DDbJ8yEwUiA?si=VpaiLthCY3AQfmhG
         playerVars: {
             'autoplay': 0,
             'controls': 0,
             'loop': 1,
-            'playlist': 'DDbJ8yEwUiA', // Required for looping single video in YT player
-            'start': 0,
+            'playlist': LOCKED_MUSIC, // Required for looping single video in YT player
+            'start': 25,
             'mute': 0,
             'playsinline': 1,
             'rel': 0,
@@ -158,8 +160,23 @@ window.onYouTubeIframeAPIReady = function () {
 };
 
 function onPlayerReady(event) {
+
     isPlayerReady = true;
-    player.setVolume(60); // Set to a pleasant ambient volume level (0-100)
+
+    player.setVolume(60);
+
+    if (pendingAutoPlay) {
+
+        pendingAutoPlay = false;
+
+        if (isUnlocked) {
+            playBirthdayMusic();
+        } else {
+            startMusicPlayback();
+        }
+
+    }
+
 }
 
 function onPlayerStateChange(event) {
@@ -168,6 +185,39 @@ function onPlayerStateChange(event) {
         player.seekTo(0);
         player.playVideo();
     }
+}
+
+// Shared "start playing" logic used by both the manual button and the
+// automatic post-voice-greeting trigger, so the UI stays in sync either way
+function startMusicPlayback() {
+    player.playVideo();
+    musicToggleBtn.classList.remove("muted");
+    musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
+    isAudioPlaying = true;
+}
+
+function playBirthdayMusic() {
+
+    if (!isPlayerReady || !player) return;
+
+    player.cueVideoById(BIRTHDAY_MUSIC);
+
+    setTimeout(() => {
+
+        player.loadVideoById({
+            videoId: BIRTHDAY_MUSIC,
+            startSeconds: 0
+        });
+
+        player.setVolume(65);
+
+        musicToggleBtn.classList.remove("muted");
+        musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
+
+        isAudioPlaying = true;
+
+    }, 300);
+
 }
 
 musicToggleBtn.addEventListener("click", () => {
@@ -189,10 +239,7 @@ musicToggleBtn.addEventListener("click", () => {
         musicToggleBtn.querySelector(".music-icon").classList.remove("icon-playing");
         isAudioPlaying = false;
     } else {
-        player.playVideo();
-        musicToggleBtn.classList.remove("muted");
-        musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
-        isAudioPlaying = true;
+        startMusicPlayback();
     }
 });
 // ==========================================
@@ -381,12 +428,16 @@ function updateCountdown() {
 function triggerReveal(isRealTime = false) {
     if (isUnlocked) return;
     isUnlocked = true;
+    if (isPlayerReady && player) {
+        player.stopVideo();
+    }
     // Start floating pages only once
     if (!floatingPagesInterval) {
         floatingPagesInterval = setInterval(spawnPage, 1500);
     }
 
-    // Duplicate/Move the Q&A and Games hub into the unlocked page collapsible wrapper
+    // Move the Games hub into the unlocked page's collapsible wrapper (games only —
+    // the quiz now lives permanently on the unlocked page, it's never moved)
     const hubNode = document.querySelector(".waiting-room-hub");
     if (hubNode && unlockedHubWrapper) {
         unlockedHubWrapper.appendChild(hubNode);
@@ -414,6 +465,7 @@ function triggerReveal(isRealTime = false) {
             setTimeout(() => {
                 unlockedStateEl.classList.add("active");
                 fireworkConfetti();
+                playBirthdayVoiceThenMusic();
             }, 800);
         }, 1500);
     } else {
@@ -423,8 +475,50 @@ function triggerReveal(isRealTime = false) {
         // Trigger small welcoming confetti burst
         setTimeout(() => {
             fireworkConfetti();
+            playBirthdayVoiceThenMusic();
         }, 1000);
     }
+}
+
+// ==========================================
+// BIRTHDAY VOICE GREETING + FOLLOW-UP MUSIC
+// ==========================================
+// On unlock: a synthesized voice says "Happy Birthday", then once it finishes,
+// the ambient YouTube track starts automatically. No external audio file is
+// needed for the voice — it uses the browser's built-in text-to-speech.
+// NOTE: some mobile browsers block ALL audio (including speech synthesis)
+// from starting without a direct tap. If that happens here, nothing plays
+// automatically, but the "Ambient Music" button in the corner still works
+// as a manual fallback — no error, it just silently skips ahead.
+function playBirthdayVoiceThenMusic() {
+    try {
+        if (!("speechSynthesis" in window)) {
+            attemptAutoStartMusic();
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
+        utterance.rate = 1.0;   // faster and more energetic
+        utterance.pitch = 1.5;  // higher pitch for more excitement and joy
+        utterance.onend = attemptAutoStartMusic;
+        utterance.onerror = attemptAutoStartMusic; // if speech is blocked, just go straight to music
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        attemptAutoStartMusic();
+    }
+}
+
+function attemptAutoStartMusic() {
+
+    if (isPlayerReady && player) {
+
+        playBirthdayMusic();
+
+    } else {
+
+        pendingAutoPlay = true;
+
+    }
+
 }
 
 // Confetti Reveal Visuals

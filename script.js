@@ -59,28 +59,6 @@ function tryPlayRevealAudio() {
     document.addEventListener(evt, function unlockAudioOnce() {
         if (userInteracted) return;
         userInteracted = true;
-try {
-    if ("speechSynthesis" in window) {
-        const warmup = new SpeechSynthesisUtterance(" ");
-        warmup.volume = 0;
-        window.speechSynthesis.speak(warmup);
-    }
-} catch (e) {}
-       
-// Warm up speech synthesis for mobile browsers
-try {
-
-    if ("speechSynthesis" in window) {
-
-        const warmup = new SpeechSynthesisUtterance(" ");
-
-        warmup.volume = 0;
-
-        window.speechSynthesis.speak(warmup);
-
-    }
-
-} catch (e) {}
 
         // Try to start the locked/ambient track too, in case its own
         // autoplay attempt (see section 3) got blocked earlier.
@@ -269,53 +247,33 @@ function onPlayerStateChange(event) {
 // Shared "start playing" logic used by both the manual button and the
 // automatic post-voice-greeting trigger, so the UI stays in sync either way
 function startMusicPlayback() {
-
-    if (!player || !isPlayerReady) return;
-
-    player.mute();
-
     player.playVideo();
-
-    setTimeout(() => {
-        player.unMute();
-        player.setVolume(60);
-    }, 300);
-
     musicToggleBtn.classList.remove("muted");
     musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
-
     isAudioPlaying = true;
 }
 
 function playBirthdayMusic() {
 
-    if (!player || !isPlayerReady) return;
+    if (!isPlayerReady || !player) return;
 
-    player.loadVideoById({
-        videoId: BIRTHDAY_MUSIC,
-        startSeconds: 0
-    });
-
-    player.mute();
-
-    player.playVideo();
+    player.cueVideoById(BIRTHDAY_MUSIC);
 
     setTimeout(() => {
-        player.unMute();
+
+        player.loadVideoById({
+            videoId: BIRTHDAY_MUSIC,
+            startSeconds: 0
+        });
+
         player.setVolume(65);
+
+        musicToggleBtn.classList.remove("muted");
+        musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
+
+        isAudioPlaying = true;
+
     }, 300);
-
-    musicToggleBtn.classList.remove("muted");
-    musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
-
-    isAudioPlaying = true;
-}
-
-    musicToggleBtn.classList.remove("muted");
-
-    musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
-
-    isAudioPlaying = true;
 
 }
 

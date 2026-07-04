@@ -34,6 +34,17 @@ let floatingPagesInterval = null;
 let userHasInteracted = false;
 let pendingVoiceGreeting = false;
 
+["click", "touchstart", "keydown"].forEach(evt => {
+    window.addEventListener(evt, function unlockAudioOnce() {
+        userHasInteracted = true;
+        if (pendingVoiceGreeting) {
+            pendingVoiceGreeting = false;
+            playBirthdayVoiceThenMusic();
+        }
+        ["click", "touchstart", "keydown"].forEach(e => window.removeEventListener(e, unlockAudioOnce));
+    });
+});
+
 // ==========================================
 // 2. AMBIENT BACKGROUND FIREFLY CANVAS
 // ==========================================
@@ -467,7 +478,11 @@ function triggerReveal(isRealTime = false) {
             setTimeout(() => {
                 unlockedStateEl.classList.add("active");
                 fireworkConfetti();
-                playBirthdayVoiceThenMusic();
+                if (userHasInteracted) {
+                    playBirthdayVoiceThenMusic();
+                } else {
+                    pendingVoiceGreeting = true;
+                }
             }, 800);
         }, 1500);
     } else {
@@ -477,11 +492,14 @@ function triggerReveal(isRealTime = false) {
         // Trigger small welcoming confetti burst
         setTimeout(() => {
             fireworkConfetti();
-            playBirthdayVoiceThenMusic();
+            if (userHasInteracted) {
+                playBirthdayVoiceThenMusic();
+            } else {
+                pendingVoiceGreeting = true;
+            }
         }, 1000);
     }
 }
-
 // ==========================================
 // BIRTHDAY VOICE GREETING + FOLLOW-UP MUSIC
 // ==========================================

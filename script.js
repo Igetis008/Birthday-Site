@@ -31,27 +31,6 @@ const pulsingBook = document.getElementById("pulsing-book");
 let isUnlocked = false;
 let countdownInterval;
 let floatingPagesInterval = null;
-let userHasInteracted = false;
-let pendingVoiceGreeting = false;
-
-const entryGateEl = document.getElementById("entry-gate");
-const entryGateBtn = document.getElementById("entry-gate-btn");
-
-if (entryGateBtn && entryGateEl) {
-    entryGateBtn.addEventListener("click", () => {
-        userHasInteracted = true;
-        entryGateEl.classList.add("hidden");
-        if ("speechSynthesis" in window) {
-            const warmup = new SpeechSynthesisUtterance(" ");
-            warmup.volume = 0;
-            window.speechSynthesis.speak(warmup);
-        }
-        if (pendingVoiceGreeting) {
-            pendingVoiceGreeting = false;
-            playBirthdayVoiceThenMusic();
-        }
-    });
-}
 
 // ==========================================
 // 2. AMBIENT BACKGROUND FIREFLY CANVAS

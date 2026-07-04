@@ -8,7 +8,7 @@
 
     <!-- SEO & Metadata -->
     <meta name="description"
-        content="A whimsical celebratory countdown and interactive journal filled with light, poetry, and love.">
+        content="A whimsical celebratory countdown and interactive journal filled with light, poetry, and friendship.">
     <meta name="author" content="Aric">
 
     <!-- Google Fonts: Whimsical script (Dancing Script), elegant serif (Playfair Display), and clean sans-serif (Inter) -->
@@ -87,27 +87,13 @@
             <!-- Teaser Headline -->
             <div class="teaser-header text-center">
                 <!-- CUSTOMIZATION POINT: Change name below -->
-                <h1 class="script-title">A new chapter for Aric is about to begin...</h1>
-                <p class="subtitle serif-italic">Patience, wanderer. The key will turn when the stars align.</p>
+                <h1 class="script-title">A little surprise is brewing for Rishika...</h1>
+                <p class="subtitle serif-italic">Patience, wanderer. All will be revealed when the time is right.</p>
             </div>
 
             <!-- Passport/Stamp Countdown Card -->
             <div class="countdown-card-wrapper">
                 <div class="countdown-card">
-                    <!-- Postmark stamp graphic -->
-                    <div class="postmark-stamp">
-                        <svg viewBox="0 0 100 100" class="svg-postmark">
-                            <circle cx="50" cy="50" r="47" fill="#FCF7F0" />
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="1.75"
-                                stroke-dasharray="3, 3" />
-                            <circle cx="50" cy="50" r="37" fill="none" stroke="currentColor" stroke-width="1.75" />
-                            <text x="50" y="43" text-anchor="middle" font-family="'Inter'" font-size="8"
-                                font-weight="700" letter-spacing="1.5">ADVENTURE</text>
-                            <path d="M 20 50 L 80 50" stroke="currentColor" stroke-width="1" />
-                            <text x="50" y="62" text-anchor="middle" font-family="'Dancing Script'" font-size="16"
-                                font-weight="bold">July 29 '26</text>
-                        </svg>
-                    </div>
 
                     <!-- Grid of Timer Digits -->
                     <div class="countdown-grid">
@@ -134,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- While You Wait Hub -->
+            <!-- While You Wait Hub (games only — the quiz now lives in the unlocked page) -->
             <div class="waiting-room-hub">
                 <div class="section-divider">
                     <span class="divider-line"></span>
@@ -142,121 +128,34 @@
                     <span class="divider-line"></span>
                 </div>
 
-                <!-- Navigation Tabs -->
-                <div class="tab-navigation">
-                    <button class="tab-btn active" data-target="games-tab">Whimsical Games</button>
-                    <button class="tab-btn" data-target="qa-tab">A Little Quiz</button>
-                </div>
+                <p class="tab-intro text-center serif-italic">A collection of tiny distractions to pass the
+                    quiet hours...</p>
 
-                <!-- Tab Contents -->
-                <div class="tab-content-container">
-
-                    <!-- GAMES TAB -->
-                    <div id="games-tab" class="tab-panel active">
-                        <p class="tab-intro text-center serif-italic">A collection of tiny distractions to pass the
-                            quiet hours...</p>
-
-                        <div class="games-grid">
-                            <!-- Game 1 Card -->
-                            <div class="game-card" id="card-scramble">
-                                <div class="game-card-icon">🌸</div>
-                                <h3>Word Bloom</h3>
-                                <p class="game-desc">Unscramble little words of wonder, one gentle bloom at a time.</p>
-                                <button class="play-btn" onclick="openGame('scramble')">Start Blooming</button>
-                            </div>
-
-                            <!-- Game 2 Card -->
-                            <div class="game-card" id="card-fillblank">
-                                <div class="game-card-icon">🖋️</div>
-                                <h3>Fill the Verse</h3>
-                                <p class="game-desc">Complete tiny original poems by choosing the word that fits best.
-                                </p>
-                                <button class="play-btn" onclick="openGame('fillblank')">Write a Verse</button>
-                            </div>
-
-                            <!-- Game 3 Card -->
-                            <div class="game-card" id="card-reorder">
-                                <div class="game-card-icon">📜</div>
-                                <h3>Verse Weaver</h3>
-                                <p class="game-desc">Weave scattered lines back into a poem. Take your time, there's no
-                                    rush.</p>
-                                <button class="play-btn" onclick="openGame('reorder')">Weave a Poem</button>
-                            </div>
-                        </div>
+                <div class="games-grid">
+                    <!-- Game 1 Card -->
+                    <div class="game-card" id="card-scramble">
+                        <div class="game-card-icon">🌸</div>
+                        <h3>Word Bloom</h3>
+                        <p class="game-desc">Unscramble little words of wonder, one gentle bloom at a time.</p>
+                        <button class="play-btn" onclick="openGame('scramble')">Start Blooming</button>
                     </div>
 
-                    <!-- QUIZ TAB -->
-                    <div id="qa-tab" class="tab-panel">
-                        <p class="tab-intro text-center serif-italic">A few little questions, just for you. Answer
-                            however feels true today — your words are saved right here on this page.</p>
+                    <!-- Game 2 Card -->
+                    <div class="game-card" id="card-fillblank">
+                        <div class="game-card-icon">🖋️</div>
+                        <h3>Fill the Verse</h3>
+                        <p class="game-desc">Complete tiny original poems by choosing the word that fits best.
+                        </p>
+                        <button class="play-btn" onclick="openGame('fillblank')">Write a Verse</button>
+                    </div>
 
-                        <div class="quiz-container" id="quiz-container">
-                            <!-- Quiz Question 1 -->
-                            <div class="quiz-question">
-                                <label for="quiz-1" class="quiz-label">Three words to describe your mood today</label>
-                                <textarea id="quiz-1" class="quiz-textarea" data-quiz-key="mood" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 2 -->
-                            <div class="quiz-question">
-                                <label for="quiz-2" class="quiz-label">A book you'd bring to a deserted island</label>
-                                <textarea id="quiz-2" class="quiz-textarea" data-quiz-key="book" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 3 -->
-                            <div class="quiz-question">
-                                <label for="quiz-3" class="quiz-label">If you could teleport anywhere right now, where
-                                    would you go?</label>
-                                <textarea id="quiz-3" class="quiz-textarea" data-quiz-key="teleport" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 4 -->
-                            <div class="quiz-question">
-                                <label for="quiz-4" class="quiz-label">Something small that made you smile this
-                                    week</label>
-                                <textarea id="quiz-4" class="quiz-textarea" data-quiz-key="smile" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 5 -->
-                            <div class="quiz-question">
-                                <label for="quiz-5" class="quiz-label">Write a tiny two-line poem about today</label>
-                                <textarea id="quiz-5" class="quiz-textarea" data-quiz-key="poem" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 6 -->
-                            <div class="quiz-question">
-                                <label for="quiz-6" class="quiz-label">One thing you want to do before your next
-                                    birthday</label>
-                                <textarea id="quiz-6" class="quiz-textarea" data-quiz-key="wish" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <!-- Quiz Question 7 -->
-                            <div class="quiz-question">
-                                <label for="quiz-7" class="quiz-label">If today were a chapter title, what would it be
-                                    called?</label>
-                                <textarea id="quiz-7" class="quiz-textarea" data-quiz-key="chapter" rows="2"
-                                    placeholder="Write your answer here..."></textarea>
-                            </div>
-
-                            <div class="quiz-actions">
-                                <button id="quiz-save-btn" class="play-btn" type="button" onclick="saveQuizAnswers()">
-                                    💾 Save Answers
-                                </button>
-
-                                <button id="quiz-delete-btn" class="delete-btn" type="button"
-                                    onclick="deleteQuizAnswers()">
-                                    🗑 Reset Answers
-                                </button>
-
-                                <span id="quiz-save-status" class="quiz-save-status"></span>
-                            </div>
-                        </div>
+                    <!-- Game 3 Card -->
+                    <div class="game-card" id="card-reorder">
+                        <div class="game-card-icon">📜</div>
+                        <h3>Verse Weaver</h3>
+                        <p class="game-desc">Weave scattered lines back into a poem. Take your time, there's no
+                            rush.</p>
+                        <button class="play-btn" onclick="openGame('reorder')">Weave a Poem</button>
                     </div>
                 </div>
             </div>
@@ -293,6 +192,37 @@
                     limitless.</p>
             </div>
 
+            <!-- Birthday Cake with Candles -->
+            <div class="cake-illustration" id="birthday-cake">
+                <svg viewBox="0 0 140 130" class="svg-cake">
+                    <!-- Plate shadow -->
+                    <ellipse cx="70" cy="112" rx="52" ry="7" fill="#C57E88" opacity="0.25" />
+                    <!-- Cake base layer -->
+                    <rect x="22" y="82" width="96" height="30" rx="7" fill="#C57E88" />
+                    <rect x="22" y="82" width="96" height="9" rx="4" fill="#F2D2D6" opacity="0.7" />
+                    <!-- Cake top layer -->
+                    <rect x="36" y="58" width="68" height="28" rx="7" fill="#F2D2D6" />
+                    <rect x="36" y="58" width="68" height="8" rx="4" fill="#FCF7F0" opacity="0.8" />
+                    <!-- Frosting drips between layers -->
+                    <path d="M36 86 q6 9 12 0 q6 9 12 0 q6 9 12 0 q6 9 12 0 q6 9 12 0 q6 9 8 0"
+                        fill="#FCF7F0" opacity="0.9" />
+                    <!-- Candles -->
+                    <g class="cake-candle">
+                        <rect x="46" y="38" width="4" height="22" rx="1.5" fill="#E5A93B" />
+                        <path class="candle-flame" d="M48 38 Q51 31 48 24 Q45 31 48 38 Z" fill="#FBBF24" />
+                    </g>
+                    <g class="cake-candle cake-candle-tall">
+                        <rect x="68" y="32" width="4" height="28" rx="1.5" fill="#A3505D" />
+                        <path class="candle-flame" d="M70 32 Q73 25 70 18 Q67 25 70 32 Z" fill="#FBBF24" />
+                    </g>
+                    <g class="cake-candle">
+                        <rect x="90" y="38" width="4" height="22" rx="1.5" fill="#E5A93B" />
+                        <path class="candle-flame" d="M92 38 Q95 31 92 24 Q89 31 92 38 Z" fill="#FBBF24" />
+                    </g>
+                </svg>
+                <p class="cake-caption serif-italic">Make a wish...</p>
+            </div>
+
             <!-- Poetry Book Page Card -->
             <div class="poetry-book-card">
                 <div class="pressed-flower-decoration">🌸</div>
@@ -315,29 +245,107 @@
                     <p class="poem-stanza">
                         Keep writing chapters full of wonder,<br>
                         Where every dawn begins anew.<br>
-                        Happy Birthday, dear Eirwen—<br>
+                        Happy Birthday, dear Rishika—<br>
                         May life be kind to you.
                     </p>
                 </div>
             </div>
 
+            <!-- A Little Quiz — only reachable after unlocking -->
+            <div class="quiz-hub-section">
+                <div class="section-divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-icon">✨ A Little Quiz, Just for You ✨</span>
+                    <span class="divider-line"></span>
+                </div>
+                <p class="tab-intro text-center serif-italic">A few little questions, just for you. Answer
+                    however feels true today — your words are saved right here on this page.</p>
+
+                <div class="quiz-container" id="quiz-container">
+                    <!-- Quiz Question 1 -->
+                    <div class="quiz-question">
+                        <label for="quiz-1" class="quiz-label">Three words to describe your mood today</label>
+                        <textarea id="quiz-1" class="quiz-textarea" data-quiz-key="mood" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 2 -->
+                    <div class="quiz-question">
+                        <label for="quiz-2" class="quiz-label">A book you'd bring to a deserted island</label>
+                        <textarea id="quiz-2" class="quiz-textarea" data-quiz-key="book" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 3 -->
+                    <div class="quiz-question">
+                        <label for="quiz-3" class="quiz-label">If you could teleport anywhere right now, where
+                            would you go?</label>
+                        <textarea id="quiz-3" class="quiz-textarea" data-quiz-key="teleport" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 4 -->
+                    <div class="quiz-question">
+                        <label for="quiz-4" class="quiz-label">Something small that made you smile this
+                            week</label>
+                        <textarea id="quiz-4" class="quiz-textarea" data-quiz-key="smile" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 5 -->
+                    <div class="quiz-question">
+                        <label for="quiz-5" class="quiz-label">Write a tiny two-line poem about today</label>
+                        <textarea id="quiz-5" class="quiz-textarea" data-quiz-key="poem" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 6 -->
+                    <div class="quiz-question">
+                        <label for="quiz-6" class="quiz-label">One thing you want to do before your next
+                            birthday</label>
+                        <textarea id="quiz-6" class="quiz-textarea" data-quiz-key="wish" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <!-- Quiz Question 7 -->
+                    <div class="quiz-question">
+                        <label for="quiz-7" class="quiz-label">If today were a chapter title, what would it be
+                            called?</label>
+                        <textarea id="quiz-7" class="quiz-textarea" data-quiz-key="chapter" rows="2"
+                            placeholder="Write your answer here..."></textarea>
+                    </div>
+
+                    <div class="quiz-actions">
+                        <button id="quiz-save-btn" class="play-btn" type="button" onclick="saveQuizAnswers()">
+                            💾 Save Answers
+                        </button>
+
+                        <button id="quiz-delete-btn" class="delete-btn" type="button"
+                            onclick="deleteQuizAnswers()">
+                            🗑 Reset Answers
+                        </button>
+
+                        <span id="quiz-save-status" class="quiz-save-status"></span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Signature at bottom -->
             <div class="signature-container text-center">
                 <span class="paper-airplane-trail">✈️</span>
                 <!-- CUSTOMIZATION POINT: Replace with your name -->
-                <p class="signature-text script-title">With all my love and wishes,</p>
+                <p class="signature-text script-title">Your friend, always,</p>
                 <p class="signature-name serif-italic">Aric</p>
             </div>
 
             <!-- Show Hub Accordion in Unlocked Mode -->
             <div class="revisit-hub-container">
                 <button id="toggle-hub-btn" class="secondary-btn">
-                    <span>Revisit The Waiting Room & Games</span>
+                    <span>Revisit The Waiting Room Games</span>
                     <span class="btn-arrow">↓</span>
                 </button>
                 <div id="unlocked-hub-wrapper" class="collapsible-hub">
-                    <!-- The JS will duplicate/move the games/QA contents here in unlocked mode -->
+                    <!-- The JS will move the games hub contents here in unlocked mode -->
                 </div>
             </div>
             <div id="floating-pages"></div>

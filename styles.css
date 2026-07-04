@@ -1681,20 +1681,3 @@ button {
         transform: scale(1.15);
     }
 }
-
-#entry-gate {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 50% 10%, #FEF8F3 0%, #FADCD5 60%, #E8B4B8 100%);
-}
-#entry-gate.hidden { display: none; }
-#entry-gate-btn {
-    padding: 18px 38px;
-    font-size: 1.15rem;
-    border-radius: 40px;
-    cursor: pointer;
-}

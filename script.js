@@ -10,7 +10,7 @@
 // CUSTOMIZATION POINT: Change your target birthday date/time here.
 // Format: ISO 8601 string. The "+05:30" denotes the timezone offset (e.g. IST).
 // If you want it for UTC, use "2026-07-15T00:00:00Z".
-const TARGET_DATE_STRING = "2020-01-01T00:00:00+05:30";
+const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
 
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";
@@ -333,7 +333,6 @@ function updateCountdown() {
     minutesEl.textContent = String(minutes).padStart(2, "0");
     secondsEl.textContent = String(seconds).padStart(2, "0");
 }
-
 function triggerReveal(isRealTime = false) {
     if (isUnlocked) return;
     isUnlocked = true;
@@ -346,6 +345,12 @@ function triggerReveal(isRealTime = false) {
     const hubNode = document.querySelector(".waiting-room-hub");
     if (hubNode && unlockedHubWrapper) {
         unlockedHubWrapper.appendChild(hubNode);
+        // The heading said "While You Wait" — no longer true now that she's unlocked it,
+        // so swap it for wording that fits the reveal page instead
+        const dividerLabel = hubNode.querySelector(".divider-icon");
+        if (dividerLabel) {
+            dividerLabel.textContent = "✨ A Little More Magic ✨";
+        }
     }
 
     if (isRealTime) {

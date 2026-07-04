@@ -1375,6 +1375,17 @@ button {
         padding: 30px 15px;
     }
 
+    .countdown-grid {
+        padding-right: 20px;
+    }
+
+    .postmark-stamp {
+        width: 58px;
+        height: 58px;
+        top: -8px;
+        right: -5px;
+    }
+
     .time-num {
         font-size: 2.5rem;
     }
@@ -1474,6 +1485,7 @@ button {
 @media (max-width: 360px) {
     .countdown-grid {
         gap: 6px;
+        padding-right: 18px;
     }
 
     .time-num {
@@ -1520,8 +1532,7 @@ button {
     position: absolute;
     bottom: -90px;
     filter:
-        drop-shadow(0 0 8px rgba(229, 169, 59, 0.35))
-        drop-shadow(0 6px 10px rgba(0, 0, 0, 0.12));
+        drop-shadow(0 0 8px rgba(229, 169, 59, 0.35)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.12));
     animation: pageFloat linear forwards;
     user-select: none;
 }
@@ -1539,20 +1550,25 @@ button {
         transform: translateY(0) translateX(0) rotate(0deg) scale(0.85);
         opacity: 0;
     }
+
     10% {
         opacity: 1;
         transform: translateY(-12vh) translateX(calc(var(--drift) * 0.15)) rotate(var(--wobble)) scale(1);
     }
+
     35% {
         transform: translateY(-42vh) translateX(calc(var(--drift) * 0.5)) rotate(calc(var(--wobble) * -1.4)) scale(1);
     }
+
     60% {
         transform: translateY(-72vh) translateX(calc(var(--drift) * 0.75)) rotate(calc(var(--wobble) * 1.1)) scale(0.96);
     }
+
     85% {
         opacity: 0.85;
         transform: translateY(-102vh) translateX(calc(var(--drift) * 0.92)) rotate(calc(var(--rotate) * 0.85)) scale(0.92);
     }
+
     100% {
         transform: translateY(-128vh) translateX(var(--drift)) rotate(var(--rotate)) scale(0.88);
         opacity: 0;
@@ -1579,9 +1595,11 @@ button {
         transform: translateY(0) translateX(0) rotate(0deg);
         opacity: 0;
     }
+
     15% {
         opacity: 1;
     }
+
     100% {
         transform: translateY(-90vh) translateX(var(--drift)) rotate(180deg);
         opacity: 0;
@@ -1589,6 +1607,15 @@ button {
 }
 
 @keyframes sparkleTwinkle {
-    0%, 100% { opacity: 0.4; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.15); }
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
 }

@@ -506,11 +506,40 @@ function triggerReveal(isRealTime = false) {
 // automatically, but the "Ambient Music" button in the corner still works
 // as a manual fallback — no error, it just silently skips ahead.
 function playBirthdayVoiceThenMusic() {
+    silenceMusicForVoice();   // <-- ADD this line
     try {
         if (!("speechSynthesis" in window)) {
             attemptAutoStartMusic();
             return;
         }
+        const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.5;
+        utterance.onend = attemptAutoStartMusic;
+        utterance.onerror = attemptAutoStartMusic;
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        attemptAutoStartMusic();
+    }
+}
+
+function playBirthdayVoiceThenMusic() {
+    try {
+        if (!("speechSynthesis" in window)) {
+            attemptAutoStartMusic();
+            return;
+        }
+function silenceMusicForVoice() {
+    if (isPlayerReady && player) {
+        try { player.pauseVideo(); } catch (e) {}
+    }
+    isAudioPlaying = false;
+    if (musicToggleBtn) {
+        musicToggleBtn.classList.add("muted");
+        const icon = musicToggleBtn.querySelector(".music-icon");
+        if (icon) icon.classList.remove("icon-playing");
+    }
+}       
         const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
         utterance.rate = 1.0;   // faster and more energetic
         utterance.pitch = 1.5;  // higher pitch for more excitement and joy

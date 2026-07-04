@@ -31,6 +31,8 @@ const pulsingBook = document.getElementById("pulsing-book");
 let isUnlocked = false;
 let countdownInterval;
 let floatingPagesInterval = null;
+let userHasInteracted = false;
+let pendingVoiceGreeting = false;
 
 // ==========================================
 // 2. AMBIENT BACKGROUND FIREFLY CANVAS

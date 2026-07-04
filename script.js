@@ -10,7 +10,7 @@
 // CUSTOMIZATION POINT: Change your target birthday date/time here.
 // Format: ISO 8601 string. The "+05:30" denotes the timezone offset (e.g. IST).
 // If you want it for UTC, use "2026-07-15T00:00:00Z".
-const TARGET_DATE_STRING = "2020-07-29T00:00:00+05:30";
+const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
 
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";

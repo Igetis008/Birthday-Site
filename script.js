@@ -15,6 +15,7 @@ const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";
 const SENDER_NAME = "Aric";
+const QUIZ_FORM_ENDPOINT = "https://formspree.io/f/xjgqjjvd";
 
 // DOM References
 const daysEl = document.getElementById("days");
@@ -238,36 +239,78 @@ function loadQuizAnswers() {
     });
 }
 
-function saveQuizAnswers() {
+function collectQuizAnswers() {
     const answers = {};
     quizTextareas.forEach(area => {
         answers[area.getAttribute("data-quiz-key")] = area.value;
     });
+    return answers;
+}
+
+function isQuizFullyAnswered() {
+    return Array.from(quizTextareas).every(area => area.value.trim().length > 0);
+}
+
+// Silent local save — runs whenever a field loses focus. Does NOT email anything.
+function persistQuizAnswersLocally() {
     try {
-        localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(answers));
-        if (quizSaveStatus) {
-            quizSaveStatus.textContent = "✨ Saved";
-            setTimeout(() => { quizSaveStatus.textContent = ""; }, 2500);
-        }
+        localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(collectQuizAnswers()));
     } catch (e) {
-        if (quizSaveStatus) quizSaveStatus.textContent = "Couldn't save — try again";
+        // ignore — localStorage may be unavailable
     }
 }
 
-function deleteQuizAnswers() {
+// Triggered ONLY by the "Save My Answers" button. Emails via Formspree ONLY
+// once every single question has been filled in.
+function saveQuizAnswers() {
+    persistQuizAnswersLocally();
 
-    if (!confirm("Reset all saved quiz answers?")) {
+    if (!isQuizFullyAnswered()) {
+        if (quizSaveStatus) {
+            quizSaveStatus.textContent = `Saved so far — answer everything to send it to ${SENDER_NAME}`;
+            setTimeout(() => { quizSaveStatus.textContent = ""; }, 3500);
+        }
         return;
     }
 
-    localStorage.removeItem(QUIZ_STORAGE_KEY);
+    if (!QUIZ_FORM_ENDPOINT) {
+        if (quizSaveStatus) {
+            quizSaveStatus.textContent = "✨ All done! Saved on this device";
+            setTimeout(() => { quizSaveStatus.textContent = ""; }, 2500);
+        }
+        return;
+    }
 
+    if (quizSaveStatus) quizSaveStatus.textContent = "Sending...";
+
+    fetch(QUIZ_FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(collectQuizAnswers())
+    })
+        .then(response => {
+            if (quizSaveStatus) {
+                quizSaveStatus.textContent = response.ok ? "✨ All done! Sent" : "Saved locally (send failed)";
+                setTimeout(() => { quizSaveStatus.textContent = ""; }, 2500);
+            }
+        })
+        .catch(() => {
+            if (quizSaveStatus) {
+                quizSaveStatus.textContent = "Saved locally (send failed)";
+                setTimeout(() => { quizSaveStatus.textContent = ""; }, 2500);
+            }
+        });
+}
+
+function deleteQuizAnswers() {
+    if (!confirm("Reset all saved quiz answers?")) {
+        return;
+    }
+    localStorage.removeItem(QUIZ_STORAGE_KEY);
     quizTextareas.forEach(area => {
         area.value = "";
     });
-
     quizSaveStatus.textContent = "🗑 Answers reset.";
-
     setTimeout(() => {
         quizSaveStatus.textContent = "";
     }, 2500);
@@ -275,15 +318,17 @@ function deleteQuizAnswers() {
 
 if (quizTextareas.length) {
     loadQuizAnswers();
-    // Also autosave quietly whenever a field loses focus
+    // IMPORTANT: this calls persistQuizAnswersLocally, NOT saveQuizAnswers —
+    // that's what stops it from emailing on every single blur/keystroke
     quizTextareas.forEach(area => {
-        area.addEventListener("blur", saveQuizAnswers);
+        area.addEventListener("blur", persistQuizAnswersLocally);
     });
 }
 
 if (quizDeleteBtn) {
     quizDeleteBtn.addEventListener("click", deleteQuizAnswers);
 }
+
 // Toggle "Revisit Hub" in Unlocked state
 const toggleHubBtn = document.getElementById("toggle-hub-btn");
 const unlockedHubWrapper = document.getElementById("unlocked-hub-wrapper");

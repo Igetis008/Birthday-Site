@@ -10,7 +10,7 @@
 // CUSTOMIZATION POINT: Change your target birthday date/time here.
 // Format: ISO 8601 string. The "+05:30" denotes the timezone offset (e.g. IST).
 // If you want it for UTC, use "2026-07-15T00:00:00Z".
-const TARGET_DATE_STRING = "2020-07-29T00:00:00+05:30";
+const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
 
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";
@@ -31,14 +31,6 @@ const pulsingBook = document.getElementById("pulsing-book");
 let isUnlocked = false;
 let countdownInterval;
 let floatingPagesInterval = null;
-let floatingPagesStopTimeout = null;
-
-// --- Entry Gate ---
-// A single tap here, taken before the countdown ever finishes, is what lets
-// speechSynthesis/audio play automatically later even though the unlock
-// itself happens with zero further clicks. Without this, Vercel's stricter
-// autoplay policy (real HTTPS domain) blocks it silently — which is why it
-// can look fine in a local VS Code preview and stay silent once deployed.
 let userHasInteracted = false;
 let pendingVoiceGreeting = false;
 
@@ -49,19 +41,11 @@ if (entryGateBtn && entryGateEl) {
     entryGateBtn.addEventListener("click", () => {
         userHasInteracted = true;
         entryGateEl.classList.add("hidden");
-
-        // "Warm up" speech synthesis with a silent, near-instant utterance.
-        // Some browsers need at least one speak() call inside a real click
-        // handler before any LATER speak() call (even an automatic one) is
-        // allowed to actually produce sound.
-        try {
-            if ("speechSynthesis" in window) {
-                const warmup = new SpeechSynthesisUtterance(" ");
-                warmup.volume = 0;
-                window.speechSynthesis.speak(warmup);
-            }
-        } catch (e) { /* ignore — falls back to normal flow below */ }
-
+        if ("speechSynthesis" in window) {
+            const warmup = new SpeechSynthesisUtterance(" ");
+            warmup.volume = 0;
+            window.speechSynthesis.speak(warmup);
+        }
         if (pendingVoiceGreeting) {
             pendingVoiceGreeting = false;
             playBirthdayVoiceThenMusic();
@@ -472,13 +456,6 @@ function triggerReveal(isRealTime = false) {
     if (!floatingPagesInterval) {
         floatingPagesInterval = setInterval(spawnPage, 1500);
     }
-    // Let pages keep drifting up through the reveal transition and the first
-    // few seconds of the "Happy Birthday" moment, then stop spawning new ones.
-    // Each already-spawned page finishes its own ~13-20s float-up animation and
-    // removes itself, so they taper off naturally rather than cutting off abruptly
-    // — but no new ones appear once you scroll on to the poem/quiz/gallery.
-    clearTimeout(floatingPagesStopTimeout);
-    floatingPagesStopTimeout = setTimeout(stopFloatingPages, 7000);
 
     // Move the Games hub into the unlocked page's collapsible wrapper (games only —
     // the quiz now lives permanently on the unlocked page, it's never moved)
@@ -509,11 +486,7 @@ function triggerReveal(isRealTime = false) {
             setTimeout(() => {
                 unlockedStateEl.classList.add("active");
                 fireworkConfetti();
-                if (userHasInteracted) {
-                    playBirthdayVoiceThenMusic();
-                } else {
-                    pendingVoiceGreeting = true;
-                }
+                playBirthdayVoiceThenMusic();
             }, 800);
         }, 1500);
     } else {
@@ -523,11 +496,7 @@ function triggerReveal(isRealTime = false) {
         // Trigger small welcoming confetti burst
         setTimeout(() => {
             fireworkConfetti();
-            if (userHasInteracted) {
-                playBirthdayVoiceThenMusic();
-            } else {
-                pendingVoiceGreeting = true;
-            }
+            playBirthdayVoiceThenMusic();
         }, 1000);
     }
 }
@@ -1064,13 +1033,6 @@ const SPARKLE_SVG_MARKUP = `
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 0 L14.2 9.8 L24 12 L14.2 14.2 L12 24 L9.8 14.2 L0 12 L9.8 9.8 Z" fill="#E5A93B"/>
 </svg>`;
-
-function stopFloatingPages() {
-    if (floatingPagesInterval) {
-        clearInterval(floatingPagesInterval);
-        floatingPagesInterval = null;
-    }
-}
 
 function spawnPage() {
     const container = document.getElementById("floating-pages");

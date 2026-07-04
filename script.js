@@ -248,6 +248,9 @@ function onPlayerStateChange(event) {
 // automatic post-voice-greeting trigger, so the UI stays in sync either way
 function startMusicPlayback() {
     player.playVideo();
+   setTimeout(() => {
+    console.log(player.getPlayerState());
+}, 500);
     musicToggleBtn.classList.remove("muted");
     musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
     isAudioPlaying = true;

@@ -26,6 +26,15 @@
 </head>
 
 <body>
+    <!-- Entry gate: this single tap is what gives the browser a genuine "user
+         gesture" early on. Vercel (HTTPS, real domain) enforces autoplay/speech
+         restrictions much more strictly than a local VS Code Live Server does,
+         which is exactly why this can work locally and stay silent once deployed
+         without this gate. -->
+    <div id="entry-gate">
+        <button id="entry-gate-btn" type="button">✨ Tap to Begin ✨</button>
+    </div>
+
     <!-- Firefly Canvas for Background Glow Particles -->
     <canvas id="firefly-canvas"></canvas>
 
@@ -348,10 +357,17 @@
                     <!-- The JS will move the games hub contents here in unlocked mode -->
                 </div>
             </div>
-            <div id="floating-pages"></div>
         </section>
 
     </main>
+
+    <!-- Floating book pages/sparkles overlay — lives OUTSIDE .main-wrapper and outside
+         any .state-container on purpose. .state-container uses a CSS transform, which
+         would otherwise turn this element's `position: fixed` into something scoped to
+         that section (and .main-wrapper's overflow:hidden would clip it too), so keeping
+         it here is what lets it span the full viewport width and keep floating through
+         the locked → unlocked transition instead of disappearing/getting clipped. -->
+    <div id="floating-pages"></div>
 
     <!-- ========================================== -->
     <!-- INTERACTIVE GAME SCREEN OVERLAYS (MODALS)  -->

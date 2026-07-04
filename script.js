@@ -10,7 +10,7 @@
 // CUSTOMIZATION POINT: Change your target birthday date/time here.
 // Format: ISO 8601 string. The "+05:30" denotes the timezone offset (e.g. IST).
 // If you want it for UTC, use "2026-07-15T00:00:00Z".
-const TARGET_DATE_STRING = "2026-07-29T00:00:00+05:30";
+const TARGET_DATE_STRING = "2020-01-01T00:00:00+05:30";
 
 // CUSTOMIZATION POINT: Names of the characters
 const TARGET_NAME = "Rishika";
@@ -30,6 +30,7 @@ const pulsingBook = document.getElementById("pulsing-book");
 // State tracking
 let isUnlocked = false;
 let countdownInterval;
+let floatingPagesInterval = null;
 
 // ==========================================
 // 2. AMBIENT BACKGROUND FIREFLY CANVAS
@@ -336,6 +337,10 @@ function updateCountdown() {
 function triggerReveal(isRealTime = false) {
     if (isUnlocked) return;
     isUnlocked = true;
+    // Start floating pages only once
+    if (!floatingPagesInterval) {
+        floatingPagesInterval = setInterval(spawnPage, 1500);
+    }
 
     // Duplicate/Move the Q&A and Games hub into the unlocked page collapsible wrapper
     const hubNode = document.querySelector(".waiting-room-hub");
@@ -839,4 +844,82 @@ function shuffleDeck(array) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
+}
+
+/* ==========================================
+    11. FLOATING BOOK PAGES (pure CSS/SVG — no image file needed)
+========================================== */
+
+// A small dog-eared page drawn entirely in SVG, styled to match the site's
+// cream/rose/gold palette. No external image file required.
+const PAGE_SVG_MARKUP = `
+<svg viewBox="0 0 60 76" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 2 H50 L58 10 V72 a2 2 0 0 1 -2 2 H4 a2 2 0 0 1 -2 -2 V4 a2 2 0 0 1 2 -2 Z"
+          fill="#FBF3E7" stroke="#C57E88" stroke-width="1.6"/>
+    <path d="M50 2 V8 a2 2 0 0 0 2 2 H58 Z" fill="#F2D2D6" stroke="#C57E88" stroke-width="1.2" stroke-linejoin="round"/>
+    <line x1="10" y1="24" x2="46" y2="24" stroke="#E5A93B" stroke-width="1.4" stroke-linecap="round" opacity="0.55"/>
+    <line x1="10" y1="34" x2="42" y2="34" stroke="#E5A93B" stroke-width="1.4" stroke-linecap="round" opacity="0.45"/>
+    <line x1="10" y1="44" x2="38" y2="44" stroke="#E5A93B" stroke-width="1.4" stroke-linecap="round" opacity="0.35"/>
+    <line x1="10" y1="54" x2="30" y2="54" stroke="#E5A93B" stroke-width="1.4" stroke-linecap="round" opacity="0.25"/>
+</svg>`;
+
+// A tiny sparkle that occasionally drifts up alongside a page, for extra magic
+const SPARKLE_SVG_MARKUP = `
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 0 L14.2 9.8 L24 12 L14.2 14.2 L12 24 L9.8 14.2 L0 12 L9.8 9.8 Z" fill="#E5A93B"/>
+</svg>`;
+
+function spawnPage() {
+    const container = document.getElementById("floating-pages");
+    if (!container) return;
+
+    const page = document.createElement("div");
+    page.className = "floating-page";
+    page.innerHTML = PAGE_SVG_MARKUP;
+
+    page.style.left = Math.random() * 96 + "vw";
+    page.style.setProperty("--drift", (Math.random() * 160 - 80) + "px");
+    page.style.setProperty("--rotate", (Math.random() * 140 - 70) + "deg");
+    page.style.setProperty("--wobble", (Math.random() * 50 - 25) + "deg");
+
+    const duration = 13 + Math.random() * 7;
+    page.style.animationDuration = duration + "s";
+    page.style.opacity = 0.45 + Math.random() * 0.35;
+    page.style.width = 24 + Math.random() * 20 + "px";
+
+    container.appendChild(page);
+
+    const cleanup = () => page.remove();
+    page.addEventListener("animationend", cleanup);
+    // Safety net in case animationend doesn't fire (some mobile browsers on tab-switch)
+    setTimeout(cleanup, (duration + 2) * 1000);
+
+    // Occasionally send up a little sparkle alongside the page, for extra magic
+    if (Math.random() < 0.35) {
+        spawnSparkle();
+    }
+}
+
+function spawnSparkle() {
+    const container = document.getElementById("floating-pages");
+    if (!container) return;
+
+    const sparkle = document.createElement("div");
+    sparkle.className = "floating-sparkle";
+    sparkle.innerHTML = SPARKLE_SVG_MARKUP;
+
+    sparkle.style.left = Math.random() * 96 + "vw";
+    sparkle.style.setProperty("--drift", (Math.random() * 100 - 50) + "px");
+
+    const duration = 6 + Math.random() * 4;
+    // Two animations run on this element (float + twinkle) — only override the
+    // float duration, keep the twinkle's own fast 1.1s pace
+    sparkle.style.animationDuration = duration + "s, 1.1s";
+    sparkle.style.width = 8 + Math.random() * 8 + "px";
+
+    container.appendChild(sparkle);
+
+    const cleanup = () => sparkle.remove();
+    sparkle.addEventListener("animationend", cleanup);
+    setTimeout(cleanup, (duration + 2) * 1000);
 }

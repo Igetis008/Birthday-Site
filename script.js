@@ -31,6 +31,14 @@ const pulsingBook = document.getElementById("pulsing-book");
 let isUnlocked = false;
 let countdownInterval;
 let floatingPagesInterval = null;
+
+// --- "Automatic" audio gate ---
+// Browsers block ALL audio/speech until a genuine user gesture happens
+// somewhere on the page — this is a hard, permanent browser rule, not
+// something any code can bypass. To make it FEEL automatic, we listen for
+// the very first real click/tap/key/scroll-touch ANYWHERE on the page
+// (not a dedicated button) and fire whatever audio is waiting the instant
+// that happens.
 let userInteracted = false;
 let pendingRevealAudio = false;
 
@@ -42,14 +50,27 @@ function tryPlayRevealAudio() {
     }
 }
 
-["click", "touchstart", "keydown"].forEach(evt => {
+// pointerdown/mousedown/touchstart/touchend/keydown/click all count as a
+// real "user activation" gesture to the browser (mousemove/scroll alone do
+// NOT, so they're intentionally left out — they wouldn't actually unlock
+// anything). touchstart also fires the instant someone starts scrolling on
+// mobile, so for most visitors this fires within a second of landing.
+["pointerdown", "mousedown", "touchstart", "touchend", "keydown", "click"].forEach(evt => {
     document.addEventListener(evt, function unlockAudioOnce() {
+        if (userInteracted) return;
         userInteracted = true;
+
+        // Try to start the locked/ambient track too, in case its own
+        // autoplay attempt (see section 3) got blocked earlier.
+        if (!isUnlocked && isPlayerReady && player && !isAudioPlaying) {
+            startMusicPlayback();
+        }
+
         if (pendingRevealAudio) {
             pendingRevealAudio = false;
             playBirthdayVoiceThenMusic();
         }
-    }, { once: true });
+    });
 });
 
 // ==========================================
@@ -185,6 +206,14 @@ function onPlayerReady(event) {
 
     player.setVolume(60);
 
+    // Best-effort automatic attempt. If the browser already trusts this
+    // page (e.g. returning visitor) this can succeed with zero clicks; if
+    // it's blocked, nothing happens and the interaction listener above
+    // catches it on the very first tap/click instead.
+    if (!isUnlocked) {
+        try { player.playVideo(); } catch (e) {}
+    }
+
     if (pendingAutoPlay) {
 
         pendingAutoPlay = false;
@@ -200,6 +229,14 @@ function onPlayerReady(event) {
 }
 
 function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        isAudioPlaying = true;
+        musicToggleBtn.classList.remove("muted");
+        musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
+    }
+    if (event.data === YT.PlayerState.PAUSED) {
+        isAudioPlaying = false;
+    }
     // If the video ends (in case the playlist/loop parameters fail), seek to 0s and restart
     if (event.data === YT.PlayerState.ENDED) {
         player.seekTo(0);
@@ -495,40 +532,14 @@ function triggerReveal(isRealTime = false) {
         }, 1000);
     }
 }
+
 // ==========================================
 // BIRTHDAY VOICE GREETING + FOLLOW-UP MUSIC
 // ==========================================
-// On unlock: a synthesized voice says "Happy Birthday", then once it finishes,
-// the ambient YouTube track starts automatically. No external audio file is
-// needed for the voice — it uses the browser's built-in text-to-speech.
-// NOTE: some mobile browsers block ALL audio (including speech synthesis)
-// from starting without a direct tap. If that happens here, nothing plays
-// automatically, but the "Ambient Music" button in the corner still works
-// as a manual fallback — no error, it just silently skips ahead.
-function playBirthdayVoiceThenMusic() {
-    silenceMusicForVoice();   // <-- ADD this line
-    try {
-        if (!("speechSynthesis" in window)) {
-            attemptAutoStartMusic();
-            return;
-        }
-        const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.5;
-        utterance.onend = attemptAutoStartMusic;
-        utterance.onerror = attemptAutoStartMusic;
-        window.speechSynthesis.speak(utterance);
-    } catch (e) {
-        attemptAutoStartMusic();
-    }
-}
-
-function playBirthdayVoiceThenMusic() {
-    try {
-        if (!("speechSynthesis" in window)) {
-            attemptAutoStartMusic();
-            return;
-        }
+// On unlock: any currently playing music is silenced, a synthesized voice
+// says "Happy Birthday", then once it finishes, the birthday YouTube track
+// starts automatically. No external audio file is needed for the voice —
+// it uses the browser's built-in text-to-speech.
 function silenceMusicForVoice() {
     if (isPlayerReady && player) {
         try { player.pauseVideo(); } catch (e) {}
@@ -539,7 +550,15 @@ function silenceMusicForVoice() {
         const icon = musicToggleBtn.querySelector(".music-icon");
         if (icon) icon.classList.remove("icon-playing");
     }
-}       
+}
+
+function playBirthdayVoiceThenMusic() {
+    silenceMusicForVoice();
+    try {
+        if (!("speechSynthesis" in window)) {
+            attemptAutoStartMusic();
+            return;
+        }
         const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
         utterance.rate = 1.0;   // faster and more energetic
         utterance.pitch = 1.5;  // higher pitch for more excitement and joy

@@ -60,6 +60,21 @@ function tryPlayRevealAudio() {
         if (userInteracted) return;
         userInteracted = true;
 
+        // "Warm up" the speech engine the instant we get any real tap/click.
+        // Many mobile browsers only require the FIRST speak() call in a
+        // session to happen synchronously inside a real gesture — once
+        // "warmed up" this way, later speak() calls that happen slightly
+        // afterward (like the one after the countdown's confetti delay)
+        // are much more likely to actually work instead of being silently
+        // dropped with no error.
+        if ("speechSynthesis" in window) {
+            try {
+                const warmup = new SpeechSynthesisUtterance("");
+                warmup.volume = 0;
+                window.speechSynthesis.speak(warmup);
+            } catch (e) {}
+        }
+
         // Try to start the locked/ambient track too, in case its own
         // autoplay attempt (see section 3) got blocked earlier.
         if (!isUnlocked && isPlayerReady && player && !isAudioPlaying) {
@@ -562,9 +577,24 @@ function playBirthdayVoiceThenMusic() {
         const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
         utterance.rate = 1.0;   // faster and more energetic
         utterance.pitch = 1.5;  // higher pitch for more excitement and joy
-        utterance.onend = attemptAutoStartMusic;
-        utterance.onerror = attemptAutoStartMusic; // if speech is blocked, just go straight to music
+
+        let musicStarted = false;
+        const startMusicOnce = () => {
+            if (musicStarted) return;
+            musicStarted = true;
+            attemptAutoStartMusic();
+        };
+
+        utterance.onend = startMusicOnce;
+        utterance.onerror = startMusicOnce; // if speech is blocked, just go straight to music
+
         window.speechSynthesis.speak(utterance);
+
+        // Safety net: some mobile browsers silently drop speak() calls
+        // without ever firing onend or onerror. If nothing happened after
+        // a generous window, start the music anyway instead of leaving it
+        // stuck waiting indefinitely.
+        setTimeout(startMusicOnce, 4500);
     } catch (e) {
         attemptAutoStartMusic();
     }

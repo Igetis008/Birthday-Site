@@ -55,7 +55,7 @@ function tryPlayRevealAudio() {
 // NOT, so they're intentionally left out — they wouldn't actually unlock
 // anything). touchstart also fires the instant someone starts scrolling on
 // mobile, so for most visitors this fires within a second of landing.
-["keydown", "click"].forEach(evt => {
+["pointerdown", "mousedown", "touchstart", "touchend", "keydown", "click"].forEach(evt => {
     document.addEventListener(evt, function unlockAudioOnce() {
         if (userInteracted) return;
         userInteracted = true;

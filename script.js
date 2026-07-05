@@ -567,36 +567,48 @@ function silenceMusicForVoice() {
     }
 }
 
+// CUSTOMIZATION POINT: put your recorded MP3 here, next to index.html
+const VOICE_GREETING_AUDIO_SRC = "voice-greeting.mp3";
+
 function playBirthdayVoiceThenMusic() {
     silenceMusicForVoice();
+
+    let musicStarted = false;
+    const startMusicOnce = () => {
+        if (musicStarted) return;
+        musicStarted = true;
+        attemptAutoStartMusic();
+    };
+
+    // Try the real recorded clip first — sounds far better than any
+    // synthesized voice, and works identically across every phone.
+    const greetingAudio = new Audio(VOICE_GREETING_AUDIO_SRC);
+    greetingAudio.onended = startMusicOnce;
+    greetingAudio.onerror = () => speakFallbackGreeting(startMusicOnce); // file missing/broken — fall back to TTS
+
+    const playPromise = greetingAudio.play();
+    if (playPromise && playPromise.catch) {
+        playPromise.catch(() => speakFallbackGreeting(startMusicOnce));
+    }
+
+    // Safety net either way — never leave the music stuck waiting forever
+    setTimeout(startMusicOnce, 6000);
+}
+
+function speakFallbackGreeting(onDone) {
     try {
         if (!("speechSynthesis" in window)) {
-            attemptAutoStartMusic();
+            onDone();
             return;
         }
         const utterance = new SpeechSynthesisUtterance(`Happy birthday Rishikaa! You deserve all the best today!`);
-        utterance.rate = 1.0;   // faster and more energetic
-        utterance.pitch = 1.5;  // higher pitch for more excitement and joy
-
-        let musicStarted = false;
-        const startMusicOnce = () => {
-            if (musicStarted) return;
-            musicStarted = true;
-            attemptAutoStartMusic();
-        };
-
-        utterance.onend = startMusicOnce;
-        utterance.onerror = startMusicOnce; // if speech is blocked, just go straight to music
-
+        utterance.rate = 1.0;
+        utterance.pitch = 1.5;
+        utterance.onend = onDone;
+        utterance.onerror = onDone;
         window.speechSynthesis.speak(utterance);
-
-        // Safety net: some mobile browsers silently drop speak() calls
-        // without ever firing onend or onerror. If nothing happened after
-        // a generous window, start the music anyway instead of leaving it
-        // stuck waiting indefinitely.
-        setTimeout(startMusicOnce, 4500);
     } catch (e) {
-        attemptAutoStartMusic();
+        onDone();
     }
 }
 

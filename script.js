@@ -269,27 +269,22 @@ function startMusicPlayback() {
 }
 
 function playBirthdayMusic() {
-
     if (!isPlayerReady || !player) return;
 
-    player.cueVideoById(BIRTHDAY_MUSIC);
+    // Swap directly — because the player was kept silently "playing" rather
+    // than stopped, this inherits that already-permitted audio session
+    // instead of asking the browser for a brand new autoplay-with-sound.
+    player.loadVideoById({
+        videoId: BIRTHDAY_MUSIC,
+        startSeconds: 0
+    });
 
-    setTimeout(() => {
+    player.setVolume(65);
 
-        player.loadVideoById({
-            videoId: BIRTHDAY_MUSIC,
-            startSeconds: 0
-        });
+    musicToggleBtn.classList.remove("muted");
+    musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
 
-        player.setVolume(65);
-
-        musicToggleBtn.classList.remove("muted");
-        musicToggleBtn.querySelector(".music-icon").classList.add("icon-playing");
-
-        isAudioPlaying = true;
-
-    }, 300);
-
+    isAudioPlaying = true;
 }
 
 musicToggleBtn.addEventListener("click", () => {
@@ -500,9 +495,8 @@ function updateCountdown() {
 function triggerReveal(isRealTime = false) {
     if (isUnlocked) return;
     isUnlocked = true;
-    if (isPlayerReady && player) {
-        player.stopVideo();
-    }
+    // NOTE: we intentionally do NOT stop/pause the player here anymore — see
+    // silenceMusicForVoice() below for why.
     // Start floating pages only once
     if (!floatingPagesInterval) {
         floatingPagesInterval = setInterval(spawnPage, 1500);
@@ -556,14 +550,14 @@ function triggerReveal(isRealTime = false) {
 // starts automatically. No external audio file is needed for the voice —
 // it uses the browser's built-in text-to-speech.
 function silenceMusicForVoice() {
+    // We MUTE via volume rather than pause/stop. Keeping the video technically
+    // "still playing" (just silent) preserves the browser's sense that this
+    // page already has an actively-engaged audio session — which makes the
+    // upcoming swap to the birthday track far more likely to actually have
+    // sound on the very first visit, instead of only working after several
+    // reloads quietly built up trust in the background.
     if (isPlayerReady && player) {
-        try { player.pauseVideo(); } catch (e) {}
-    }
-    isAudioPlaying = false;
-    if (musicToggleBtn) {
-        musicToggleBtn.classList.add("muted");
-        const icon = musicToggleBtn.querySelector(".music-icon");
-        if (icon) icon.classList.remove("icon-playing");
+        try { player.setVolume(0); } catch (e) {}
     }
 }
 
